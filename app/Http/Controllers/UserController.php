@@ -152,8 +152,8 @@ class UserController extends Controller
 
         // check login
         if ($isLogin->isEmpty()) {
-            $response = $this->ResponseUserFormatter('failed login', 'failed', Response::HTTP_NOT_FOUND, null);
-            return response()->json($response, Response::HTTP_NOT_FOUND);
+            $response = $this->ResponseUserFormatter('failed login', 'failed', Response::HTTP_UNAUTHORIZED, null);
+            return response()->json($response, Response::HTTP_UNAUTHORIZED);
         } else {
             // check password
             if (password_verify($userReq['password'], $isLogin[0]['password'])) {
