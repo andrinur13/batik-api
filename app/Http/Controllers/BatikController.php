@@ -43,9 +43,10 @@ class BatikController extends Controller
     {
         //// create batik data
         $validator = Validator::make($request->all(), [
-            'qr_code' => ['required'],
+            // 'qr_code' => ['required'],
             'name' => ['required'],
-            'description' => ['required']
+            'description' => ['required'],
+            'img' => 'required|mimes:jpeg,bmp,png|max:2000'
         ]);
 
         // jika validator gagal dijalankan
@@ -54,17 +55,46 @@ class BatikController extends Controller
             return response()->json($response, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
+        // tangkap form data
+        $qr_code = md5($request->name);
+        $name = $request->name;
+        $description = $request->description;
+
+        if ($fileUpload = $request->file('img')) {
+            try {
+                $nameFile = time() . '-' . md5($fileUpload->getClientOriginalName()) . '.' . $fileUpload->getClientOriginalExtension();
+                $path = $fileUpload->move('img/batik', $nameFile);
+                $namePath = $fileUpload->getClientOriginalName();
+
+                // store to directory dan db
+                $saveUpload = new Batik();
+                $saveUpload->qr_code = $qr_code;
+                $saveUpload->name = $name;
+                $saveUpload->description = $description;
+                $saveUpload->path = $path;
+                $saveUpload->save();
+
+                $saveUpload->path = 'img/batik/' . $nameFile;
+
+                $response = $this->ResponseUserFormatter('success add data batik', 'success', Response::HTTP_OK, $saveUpload);
+                return response()->json($response, Response::HTTP_OK);
+            } catch (QueryExecuted $e) {
+                $response = $this->ResponseUserFormatter('failed add data batik', 'failed', Response::HTTP_UNPROCESSABLE_ENTITY, $e);
+                return response()->json($response, Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+        }
+
         // tangkap request
-        $userReq = [
-            'qr_code' => $request->qr_code,
-            'name' => $request->name,
-            'description' => $request->description
-        ];
+        // $userReq = [
+        //     'qr_code' => $request->qr_code,
+        //     'name' => $request->name,
+        //     'description' => $request->description
+        // ];
 
-        $batikAded = Batik::create($userReq);
+        // $batikAded = Batik::create($userReq);
 
-        $response = $this->ResponseUserFormatter('success add data batik', 'success', Response::HTTP_OK, $userReq);
-        return response()->json($response, Response::HTTP_OK);
+        // $response = $this->ResponseUserFormatter('success add data batik', 'success', Response::HTTP_OK, $userReq);
+        // return response()->json($response, Response::HTTP_OK);
     }
 
 
@@ -73,7 +103,7 @@ class BatikController extends Controller
         // shot batik with id 
         $batik = Batik::find($id);
 
-        if($batik == null) {
+        if ($batik == null) {
             $response = $this->ResponseUserFormatter('batik not found!', 'failed', Response::HTTP_NOT_FOUND, $batik);
             return response()->json($response, Response::HTTP_NOT_FOUND);
         }
@@ -88,7 +118,7 @@ class BatikController extends Controller
         //
         $batik = Batik::find($id);
 
-        if($batik == null) {
+        if ($batik == null) {
             $response = $this->ResponseUserFormatter('batik not found!', 'failed', Response::HTTP_UNPROCESSABLE_ENTITY, $batik);
             return response()->json($response, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
@@ -120,12 +150,12 @@ class BatikController extends Controller
 
     public function destroy($id)
     {
-        
+
         // deleted data batik with id
         $batik = Batik::find($id);
 
         // pastikan $id
-        if($batik == null) {
+        if ($batik == null) {
             $response = $this->ResponseUserFormatter('failed deleted batik', 'failed', Response::HTTP_UNPROCESSABLE_ENTITY, $batik);
             return response()->json($response, Response::HTTP_UNPROCESSABLE_ENTITY);
         }

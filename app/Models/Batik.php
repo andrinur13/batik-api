@@ -12,7 +12,8 @@ class Batik extends Model
     protected $fillable = [
         'qr_code',
         'name',
-        'description'
+        'description',
+        'path'
     ];
 
     protected $hidden = [
