@@ -74,6 +74,7 @@ class BatikController extends Controller
                 $saveUpload->description = $description;
                 $saveUpload->path = $path;
                 $nameQR = time() . '-'. $name . '.svg';
+                $nameQR = trim($nameQR, ' ');
                 $saveUpload->qr_path = 'img/qr/' . $nameQR;
                 $saveUpload->save();
                 // create QR Code and store to path
