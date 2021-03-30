@@ -6,6 +6,7 @@ use App\Models\Batik;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Symfony\Component\HttpFoundation\Response;
 
 use function PHPUnit\Framework\isEmpty;
@@ -72,7 +73,11 @@ class BatikController extends Controller
                 $saveUpload->name = $name;
                 $saveUpload->description = $description;
                 $saveUpload->path = $path;
+                $nameQR = time() . '-'. $name . '.svg';
+                $saveUpload->qr_path = 'img/qr/' . $nameQR;
                 $saveUpload->save();
+                // create QR Code and store to path
+                QrCode::size(200)->format('svg')->generate($saveUpload->id, public_path('img/qr/' . $nameQR));
 
                 $saveUpload->path = 'img/batik/' . $nameFile;
 

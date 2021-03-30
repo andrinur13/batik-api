@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\BatikController;
+use App\Http\Controllers\QRController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,3 +38,6 @@ Route::post('/batik', [BatikController::class, 'store']);
 Route::get('/batik/{id}', [BatikController::class, 'show']);
 Route::delete('/batik/{id}', [BatikController::class, 'destroy']);
 Route::put('/batik/{id}', [BatikController::class, 'edit']);
+
+
+// qr code
