@@ -57,7 +57,7 @@ class BatikController extends Controller
         }
 
         // tangkap form data
-        $qr_code = md5($request->name);
+        $qr_code = "batiknitik" . time();
         $name = $request->name;
         $description = $request->description;
 
@@ -78,7 +78,7 @@ class BatikController extends Controller
                 $saveUpload->qr_path = 'img/qr/' . $nameQR;
                 $saveUpload->save();
                 // create QR Code and store to path
-                QrCode::size(200)->format('svg')->generate($saveUpload->id, public_path('img/qr/' . $nameQR));
+                QrCode::size(200)->format('svg')->generate($saveUpload->qr_code, public_path('img/qr/' . $nameQR));
 
                 $saveUpload->path = 'img/batik/' . $nameFile;
 
@@ -104,10 +104,10 @@ class BatikController extends Controller
     }
 
 
-    public function show($id)
+    public function show($qr)
     {
         // shot batik with id 
-        $batik = Batik::find($id);
+        $batik = Batik::where('qr_code', $qr)->first();
 
         if ($batik == null) {
             $response = $this->ResponseUserFormatter('batik not found!', 'failed', Response::HTTP_NOT_FOUND, $batik);

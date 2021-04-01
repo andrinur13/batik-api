@@ -35,7 +35,7 @@ Route::get('/test', [UserController::class, 'index']);
 // batik api
 Route::get('/batik', [BatikController::class, 'index']);
 Route::post('/batik', [BatikController::class, 'store']);
-Route::get('/batik/{id}', [BatikController::class, 'show']);
+Route::get('/batik/{qr}', [BatikController::class, 'show']);
 Route::delete('/batik/{id}', [BatikController::class, 'destroy']);
 Route::put('/batik/{id}', [BatikController::class, 'edit']);
 
