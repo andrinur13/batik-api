@@ -154,11 +154,11 @@ class BatikController extends Controller
     }
 
 
-    public function destroy($id)
+    public function destroy($qr)
     {
 
         // deleted data batik with id
-        $batik = Batik::find($id);
+        $batik = Batik::where('qr_code', $qr)->first();
 
         // pastikan $id
         if ($batik == null) {
