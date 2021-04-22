@@ -7,11 +7,15 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Facades\JWTFactory;
+use Tymon\JWTAuth\JWTAuth as JWTAuthJWTAuth;
 
 class UserController extends Controller
 {
 
-
+    // ini untuk formatter
     public function ResponseUserFormatter($messages, $status, $code, $data)
     {
         $response = [
@@ -39,22 +43,7 @@ class UserController extends Controller
     }
 
 
-
-    public function index()
-    {
-        //
-        $userSearch = User::where('email', 'andribis13@gmail.com')->get();
-
-        dd($userSearch);
-    }
-
-
-    public function create()
-    {
-        //
-    }
-
-
+    // register user
     public function store(Request $request)
     {
         // untuk register user
@@ -135,18 +124,7 @@ class UserController extends Controller
             'password' => ['required']
         ]);
 
-        // jika validator gagal dijalankan
-        if ($validator->fails()) {
-            $response = $this->ResponseUserFormatter('failed validation data', 'failed', Response::HTTP_UNPROCESSABLE_ENTITY, $validator->errors());
-            return response()->json($response, Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
-        // lolos validation
-        // tangkap request
-        $userReq = [
-            'email' => $request->email,
-            'password' => $request->password
-        ];
+        $userReq = $request->only('email', 'password');
 
         $isLogin = User::where('email', $userReq['email'])->take(1)->get();
 
@@ -159,10 +137,33 @@ class UserController extends Controller
             if (password_verify($userReq['password'], $isLogin[0]['password'])) {
                 $isLogin = $isLogin[0];
 
+                // custom claims jwt
+                $claims = [
+                    'username' => $isLogin['username'],
+                    'email' => $isLogin['email'],
+                    'name' => $isLogin['name'],
+                ];
+                // create token jwt
+                try {
+                    if (!$token = JWTAuth::customClaims($claims)->attempt($userReq)) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Login credentials are invalid.',
+                        ], 400);
+                    }
+                } catch (JWTException $e) {
+                    return $userReq;
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Could not create token.',
+                    ], 500);
+                }
+                
                 $userLogedIn = [
                     'username' => $isLogin['username'],
                     'email' => $isLogin['email'],
-                    'name' => $isLogin['name']
+                    'name' => $isLogin['name'],
+                    'token' => $token
                 ];
 
                 $response = $this->ResponseUserFormatter('success login', 'success', Response::HTTP_OK, $userLogedIn);

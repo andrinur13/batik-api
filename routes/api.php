@@ -18,26 +18,26 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+// Route::middleware('auth:api')->get('/user', function (Request $request) {
+//     return $request->user();
+// });
 
 Route::post('/register', [App\Http\Controllers\UserController::class, 'store']);
+Route::post('/login', [App\Http\Controllers\UserController::class, 'login']);
 
 // Route::prefix('v1')->group(function() {
 //     Route::post('/register', [UserController::class], 'store');
 // });
 
-Route::post('/login', [App\Http\Controllers\UserController::class, 'login']);
-Route::get('/test', [UserController::class, 'index']);
+Route::group(['middleware' => ['jwt.verify']], function () {
+    // batik api
+    Route::get('/batik', [BatikController::class, 'index']);
+    Route::post('/batik', [BatikController::class, 'store']);
+    Route::get('/batik/{qr}', [BatikController::class, 'show']);
+    Route::delete('/batik/{id}', [BatikController::class, 'destroy']);
+    Route::put('/batik/{id}', [BatikController::class, 'edit']);
+});
 
-
-// batik api
-Route::get('/batik', [BatikController::class, 'index']);
-Route::post('/batik', [BatikController::class, 'store']);
-Route::get('/batik/{qr}', [BatikController::class, 'show']);
-Route::delete('/batik/{id}', [BatikController::class, 'destroy']);
-Route::put('/batik/{id}', [BatikController::class, 'edit']);
 
 
 // qr code
