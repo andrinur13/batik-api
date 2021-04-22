@@ -33,10 +33,10 @@ Route::group(['middleware' => ['jwt.verify']], function () {
     // batik api
     Route::post('/batik', [BatikController::class, 'store']);
     Route::put('/batik/{id}', [BatikController::class, 'edit']);
+    Route::delete('/batik/{id}', [BatikController::class, 'destroy']);
 });
 
 Route::get('/batik/{qr}', [BatikController::class, 'show']);
-Route::delete('/batik/{id}', [BatikController::class, 'destroy']);
 Route::get('/batik', [BatikController::class, 'index']);
 
 
