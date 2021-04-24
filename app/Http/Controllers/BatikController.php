@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\File;
 
 use function PHPUnit\Framework\isEmpty;
 
@@ -167,6 +168,10 @@ class BatikController extends Controller
         }
 
         try {
+            // delete image and qr
+            File::delete($batik->path);
+            File::delete($batik->qr_path);
+
             $batik->delete();
             $response = $this->ResponseUserFormatter('success deleted batik', 'success', Response::HTTP_OK, $batik);
             return response()->json($response, Response::HTTP_OK);
