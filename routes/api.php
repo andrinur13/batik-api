@@ -34,6 +34,7 @@ Route::group(['middleware' => ['jwt.verify']], function () {
     Route::post('/batik', [BatikController::class, 'store']);
     Route::put('/batik/{id}', [BatikController::class, 'edit']);
     Route::delete('/batik/{id}', [BatikController::class, 'destroy']);
+    Route::post('/fetchuser', [UserController::class, 'fetchUser']);
 });
 
 Route::get('/batik/{qr}', [BatikController::class, 'show']);

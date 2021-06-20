@@ -94,6 +94,29 @@ class UserController extends Controller
     }
 
 
+    public function fetchUser(Request $request) {
+        try {
+            $token = $request->header('authorization');
+            $tokenUser = explode(' ', $token);
+            $tokenUser = $tokenUser[1];
+
+            $data = JWTAuth::getPayload($tokenUser)->toArray();
+            $dataToJSON = [
+                'username' => $data['username'],
+                'email' => $data['email'],
+                'name' => $data['name']
+            ];
+
+            $response = $this->ResponseUserFormatter('fetch data user success', 'success', 200, $dataToJSON);
+            return response()->json($response, Response::HTTP_OK);
+
+        } catch (\Throwable $th) {
+            $response = $this->ResponseUserFormatter('fetch data user failed', 'success', 404, null);
+            return response()->json($response, Response::HTTP_NOT_FOUND);
+        }
+    }
+
+
     public function show(User $user)
     {
         //
